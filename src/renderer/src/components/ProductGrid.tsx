@@ -1,13 +1,14 @@
 import { useCurrency } from '@renderer/hooks/useCurrently'
 import { ProductDTO } from '@shared/types'
 
+// On utilise strictement ProductDTO, comme l'exige Redux
 interface Props {
   products: ProductDTO[]
   onAdd: (product: ProductDTO) => void
 }
 
 export function ProductGrid({ products, onAdd }: Props) {
-  const { formatPrice } = useCurrency() // Utilisation du hook useCurrency poor formater les prix
+  const { formatPrice } = useCurrency()
 
   return (
     <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 pb-4">
@@ -42,7 +43,6 @@ export function ProductGrid({ products, onAdd }: Props) {
             </p>
 
             <div className="text-xl font-black text-slate-900 dark:text-white mt-auto">
-              {/* Affiche soit 5000 FC soit 1.78 $ selon la devise choisie */}
               {formatPrice(p.sellPrice).value.toLocaleString()} {formatPrice(p.sellPrice).symbol}
               <span className="text-xs ml-1">{formatPrice(p.sellPrice).symbol}</span>
             </div>

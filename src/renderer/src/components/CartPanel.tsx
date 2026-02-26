@@ -4,6 +4,9 @@ import { useCurrency } from '@renderer/hooks/useCurrently'
 import { useDispatch } from 'react-redux'
 import { CartItemUI } from '@renderer/app/store/slice/salesSlice'
 
+// Définir le type exact attendu par votre slice Redux
+export type PaymentMethodType = 'CASH' | 'MOBILE_MONEY' | 'CARD'
+
 interface Props {
   cart: CartItemUI[]
   subTotal: number
@@ -12,7 +15,7 @@ interface Props {
   error: string | null
   onRemove: (id: string) => void
   onUpdateQty: (id: string, qty: number) => void
-  onSetMethod: (method: string) => void
+  onSetMethod: (method: PaymentMethodType) => void
   onCheckout: () => void
 }
 
@@ -144,7 +147,7 @@ export const CartPanel: React.FC<Props> = ({
       <div className="p-8 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-10 space-y-6">
         {/* Payment Methods */}
         <div className="grid grid-cols-3 gap-2">
-          {['CASH', 'MOBILE_MONEY', 'CARD'].map((method) => (
+          {(['CASH', 'MOBILE_MONEY', 'CARD'] as const).map((method) => (
             <button
               key={method}
               onClick={() => onSetMethod(method)}
