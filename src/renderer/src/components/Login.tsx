@@ -67,20 +67,16 @@ const Login: React.FC = () => {
         <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-lg shadow-slate-900/10 p-8">
           {/* Header Compact */}
           <div className="flex flex-col items-center justify-center text-center mb-6">
-            <div
-              className="w-14 h-14 bg-sky-600 rounded-2xl 
-        flex items-center justify-center 
-        text-white font-black text-2xl 
-        shadow-lg shadow-sky-600/30 mb-3"
-            >
-              M
-            </div>
-
+            {' '}
+            <div className="w-14 h-14 bg-sky-600 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-sky-600/30 mb-3">
+              {' '}
+              M{' '}
+            </div>{' '}
             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              MariaSaas
-            </h1>
-
-            <p className="text-slate-500 text-xs font-medium">Gestion de Pharmacie</p>
+              {' '}
+              MariaSaas{' '}
+            </h1>{' '}
+            <p className="text-slate-500 text-xs font-medium">Gestion de Pharmacie</p>{' '}
           </div>
 
           {/* Error Message */}
