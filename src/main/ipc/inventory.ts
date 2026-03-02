@@ -2,6 +2,15 @@ import { ipcMain } from 'electron'
 import { inventoryService } from '../services/inventoryService'
 import { procedure } from '../lib/procedure'
 import { productSchema, createRequisitionSchema } from '../../shared/schemas/inventorySchema'
+import { UserRole } from '@shared/types'
+import { z } from 'zod'
+
+// Middleware de sécurité RBAC
+function requireAdmin(role: string) {
+  if (role !== UserRole.SUPERADMIN && role !== UserRole.ADMIN) {
+    throw new Error('Accès refusé : Seuls les administrateurs peuvent gérer les fournisseurs.')
+  }
+}
 
 export function setupInventoryHandlers() {
   // Nettoyage
@@ -26,11 +35,25 @@ export function setupInventoryHandlers() {
     })
   )
 
-  // Fournisseurs
+  // GET SUPPLIERS: Ouvert à tous pour la consultation
   ipcMain.handle('inventory:get-suppliers', async () => {
     const data = await inventoryService.getAllSuppliers()
     return { success: true, data }
   })
+
+  // CREATE SUPPLIER: Protégé
+  const createSupplierPayload = z.object({
+    date: z.object({ name: z.string().min(2), phone: z.string().optional() }),
+    role: z.nativeEnum(UserRole)
+  })
+
+  ipcMain.handle(
+    'inventory:create-supplier',
+    procedure.input(createSupplierPayload).mutation(async (input) => {
+      requireAdmin(input.role) // Vérification
+      return await inventoryService.createSupplier(input.date)
+    })
+  )
 
   // Réquisitions
   ipcMain.handle(

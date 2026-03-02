@@ -5,12 +5,20 @@ import { fetchClients } from '@renderer/app/store/slice/clientSlice'
 import { ClientStats } from './ClientStats'
 import { ClientTable } from './ClientTable'
 import { AddClientModal } from './AddClientModal'
+import { UserRole } from '@shared/types'
 
 const CustomerManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
+
+  // On récupère la liste ET l'utilisateur connecté
   const { list: clients, isLoading } = useSelector((state: RootState) => state.clients)
+  const { user } = useSelector((state: RootState) => state.auth)
+
   const [searchTerm, setSearchTerm] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
+
+  // Détermination des droits (True si Admin ou SuperAdmin)
+  const isAdmin = user?.role === UserRole.SUPERADMIN || user?.role === UserRole.ADMIN
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -21,10 +29,10 @@ const CustomerManagement: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
-      {/* 1. Stats */}
+      {/* Stats */}
       <ClientStats clients={clients} />
 
-      {/* 2. Toolbar */}
+      {/* Toolbar */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="relative w-full md:w-96 group">
           <input
@@ -47,25 +55,29 @@ const CustomerManagement: React.FC = () => {
             <path d="m21 21-4.3-4.3" />
           </svg>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="w-full md:w-auto px-8 py-4 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-500 transition-all shadow-xl shadow-emerald-600/20 flex items-center justify-center gap-3 uppercase text-xs tracking-widest"
-        >
-          <svg
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            viewBox="0 0 24 24"
+
+        {/* Bouton protégé par RBAC (Seulement pour les Admins) */}
+        {isAdmin && (
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="w-full md:w-auto px-8 py-4 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-500 transition-all shadow-xl shadow-emerald-600/20 flex items-center justify-center gap-3 uppercase text-xs tracking-widest"
           >
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          Nouveau Patient
-        </button>
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Nouveau Patient
+          </button>
+        )}
       </div>
 
-      {/* 3. Table */}
+      {/* Table */}
       <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         {isLoading && clients.length === 0 ? (
           <div className="p-20 text-center animate-pulse text-slate-400 font-black uppercase tracking-widest">
@@ -76,7 +88,7 @@ const CustomerManagement: React.FC = () => {
         )}
       </div>
 
-      {/* 4. Modal */}
+      {/* Modal */}
       {showAddModal && <AddClientModal onClose={() => setShowAddModal(false)} />}
     </div>
   )

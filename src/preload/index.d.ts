@@ -25,6 +25,10 @@ declare global {
       inventory: {
         getProducts: () => Promise<ApiResponse<ProductDTO[]>>
         createProduct: (data: ProductInput) => Promise<ApiResponse<ProductDTO>>
+        createSupplier: (
+          data: { name: string; phone?: string },
+          role: string
+        ) => Promise<ApiResponse<SupplierDTO>>
         getSuppliers: () => Promise<ApiResponse<SupplierDTO[]>>
         createDraft: (data: CreateRequisitionInput) => Promise<ApiResponse<RequisitionDTO>>
         validateRequisition: (id: string) => Promise<ApiResponse<RequisitionDTO>>
@@ -56,9 +60,9 @@ declare global {
       }
       clients: {
         list: (query?: string) => Promise<ApiResponse<ClientDTO[]>>
-        create: (data: CreateClientInput) => Promise<ApiResponse<ClientDTO>>
-        update: (data: UpdateClientInput) => Promise<ApiResponse<ClientDTO>>
-        delete: (id: string) => Promise<ApiResponse<void>>
+        create: (data: CreateClientInput, role: string) => Promise<ApiResponse<ClientDTO>>
+        update: (data: UpdateClientInput, role: string) => Promise<ApiResponse<ClientDTO>>
+        delete: (id: string, role: string) => Promise<ApiResponse<void>>
       }
     }
   }

@@ -6,6 +6,11 @@ import { LoyaltyStatus } from '@shared/types'
 
 export const AddClientModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const dispatch = useDispatch<AppDispatch>()
+
+  // State pour gérer une erreur d'interface
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -15,8 +20,18 @@ export const AddClientModal: React.FC<{ onClose: () => void }> = ({ onClose }) =
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await dispatch(createNewClient(formData))
-    onClose()
+    setErrorMsg(null)
+    setIsSubmitting(true)
+
+    try {
+      // unwrap() permet de déclencher le catch() si rejectWithValue est appelé dans le thunk
+      await dispatch(createNewClient(formData)).unwrap()
+      onClose() // On ferme uniquement si c'est un succès
+    } catch (err) {
+      setErrorMsg(err as string)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -25,6 +40,14 @@ export const AddClientModal: React.FC<{ onClose: () => void }> = ({ onClose }) =
         <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-6 uppercase italic tracking-tighter">
           Nouveau Patient
         </h2>
+
+        {/* Affichage des erreurs RBAC ou de validation */}
+        {errorMsg && (
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 text-xs font-bold">
+            {errorMsg}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
@@ -62,15 +85,21 @@ export const AddClientModal: React.FC<{ onClose: () => void }> = ({ onClose }) =
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-4 text-slate-500 font-bold hover:bg-slate-100 rounded-2xl transition-all"
+              disabled={isSubmitting}
+              className="flex-1 py-4 text-slate-500 font-bold hover:bg-slate-100 rounded-2xl transition-all disabled:opacity-50"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="flex-1 py-4 bg-emerald-600 text-white font-black rounded-2xl shadow-xl hover:bg-emerald-500 transition-all"
+              disabled={isSubmitting}
+              className="flex-1 py-4 bg-emerald-600 text-white font-black rounded-2xl shadow-xl hover:bg-emerald-500 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              Enregistrer
+              {isSubmitting ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                'Enregistrer'
+              )}
             </button>
           </div>
         </form>
